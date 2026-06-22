@@ -671,12 +671,12 @@
                 URL.revokeObjectURL(video.src);
             }
             // 重置为 wtb 目录下的视频 (请确保文件存在)
-            video.src = 'wtb/video.mov';
+            video.src = 'wtb/ptddown.mov';
             // 如果浏览器不支持mov，尝试mp4
             // 这里我们同时保留两个source，但video.src会覆盖，所以重新设置
             video.load();
             video.play().catch(() => {});
-            fileName.textContent = 'wtb/video.mov';
+            fileName.textContent = 'wtb/ptddown.mov';
             fileInput.value = '';
             videoWrapper.classList.add('has-source');
             // 等待加载完成更新
@@ -699,7 +699,7 @@
             // 尝试加载 mp4 备选
             if (video.src && video.src.includes('.mov')) {
                 // 如果mov加载失败，尝试mp4
-                video.src = 'wtb/ptd批量下载.mov';
+                video.src = 'wtb/ptddown.mp4';
                 video.load();
             }
         });
