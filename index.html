@@ -5,28 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>wtb · 沉浸视频</title>
     <style>
-        /* ===== 全局重置 & 背景图 ===== */
+        /* ===== 全局重置 & 背景图（完美自适应） ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
+        html, body {
+            width: 100%;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body {
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             padding: 20px;
-            /* 使用您指定的背景图 */
+            /* 背景图 — 完美自适应，覆盖所有屏幕 */
             background-image: url('img/bjt.webp');
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            /* 备用背景色（图片加载时显示） */
+            background-color: #0b0d14;
             position: relative;
-            overflow-x: hidden;
         }
 
         /* 半透明遮罩层 — 让背景图更柔和，同时保持可读性 */
@@ -44,7 +50,7 @@
             -webkit-backdrop-filter: blur(2px);
         }
 
-        /* 动态光晕层 — 在背景图上叠加流动的极光效果，提升视觉层次 */
+        /* 动态光晕层 — 在背景图上叠加流动的极光效果 */
         body::after {
             content: '';
             position: fixed;
@@ -373,6 +379,65 @@
             .time-display {
                 font-size: 0.65rem;
                 padding: 2px 8px;
+            }
+        }
+
+        /* 针对高度较小的屏幕，调整内边距 */
+        @media (max-height: 700px) {
+            .player-card {
+                padding: 16px 20px 20px;
+            }
+            .controls {
+                padding: 10px 16px;
+                margin-top: 14px;
+            }
+            .upload-area {
+                margin-top: 12px;
+                padding: 4px 12px;
+            }
+        }
+
+        @media (max-height: 500px) {
+            .player-card {
+                padding: 12px 16px 16px;
+                border-radius: 28px;
+            }
+            .controls {
+                padding: 6px 12px;
+                gap: 6px;
+                margin-top: 10px;
+            }
+            .controls button {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            .video-wrapper {
+                border-radius: 20px;
+            }
+            .upload-area {
+                margin-top: 8px;
+                padding: 4px 10px;
+                gap: 8px;
+            }
+            .upload-label {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+            }
+            .file-name {
+                font-size: 0.7rem;
+                padding: 2px 10px;
+            }
+            .reset-btn {
+                font-size: 0.7rem;
+                padding: 2px 10px;
+            }
+            .time-display {
+                font-size: 0.6rem;
+                padding: 2px 8px;
+            }
+            .play-btn {
+                font-size: 20px;
             }
         }
 
