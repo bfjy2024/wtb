@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>沉浸 · 视频播放器</title>
+    <style>
+        /* 全局重置 & 优雅字体 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0d10;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 20px;
+        }
+
+        /* 卡片式播放器 — 柔光玻璃质感 */
+        .player-card {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(22, 26, 32, 0.75);
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border-radius: 42px;
+            padding: 24px 24px 32px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
+            transition: all 0.25s ease;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* 视频容器 — 圆角 & 阴影 */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 */
+            border-radius: 28px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 12px 30px rgba(0, 0, 0, 0.6);
+            transition: box-shadow 0.3s;
+        }
+
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;  /* 保持比例，铺满容器 */
+            background: #101010;
+            cursor: pointer;
+        }
+
+        /* 自定义控制栏 — 悬浮在底部，半透明磨砂 */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 12px 18px;
+            background: rgba(12, 15, 20, 0.7);
+            backdrop-filter: blur(8px) saturate(160%);
+            -webkit-backdrop-filter: blur(8px) saturate(160%);
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+            transition: background 0.2s;
+        }
+
+        .controls button {
+            background: transparent;
+            border: none;
+            color: #f0f4fc;
+            font-size: 22px;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(2px);
+            flex-shrink: 0;
+        }
+
+        .controls button:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: scale(1.04);
+            color: #ffffff;
+        }
+
+        .controls button:active {
+            transform: scale(0.94);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* 进度条容器 */
+        .progress-container {
+            flex: 1;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: height 0.15s;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+        }
+
+        .progress-bar:hover {
+            height: 7px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #b3baff, #7a8cff);
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(100, 140, 255, 0.5);
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        /* 时间显示 */
+        .time-display {
+            color: #d0d9e8;
+            font-size: 0.9rem;
+            font-weight: 450;
+            letter-spacing: 0.3px;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 12px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.04);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 右侧控制组 (音量 + 全屏) */
+        .right-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .right-controls button {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .right-controls button:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* 音量滑块 (迷你) */
+        .volume-slider {
+            width: 0;
+            overflow: hidden;
+            transition: width 0.25s ease, opacity 0.2s;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-slider.show {
+            width: 72px;
+            opacity: 1;
+        }
+
+        .volume-slider input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 6px;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        .volume-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #d6e0ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(70, 130, 255, 0.5);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .volume-slider input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #d6e0ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* 播放/暂停 图标微调 */
+        .play-btn {
+            font-size: 26px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .player-card {
+                padding: 16px 16px 24px;
+                border-radius: 32px;
+            }
+            .controls {
+                padding: 10px 14px;
+                gap: 8px;
+                border-radius: 40px;
+                flex-wrap: nowrap;
+            }
+            .controls button {
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+            }
+            .time-display {
+                font-size: 0.75rem;
+                padding: 2px 10px;
+            }
+            .right-controls button {
+                width: 36px;
+                height: 36px;
+                font-size: 17px;
+            }
+            .volume-slider.show {
+                width: 54px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .controls {
+                gap: 4px;
+            }
+            .progress-container {
+                min-width: 60px;
+            }
+            .time-display {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+            }
+        }
+
+        /* 加载/提示文字（优雅占位） */
+        .video-wrapper::after {
+            content: "🎬 准备就绪";
+            position: absolute;
+            bottom: 20px;
+            right: 24px;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 0.6px;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 16px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            border: 1px solid rgba(255,255,255,0.04);
+            opacity: 0.8;
+            transition: opacity 0.5s;
+        }
+
+        /* 当视频有源时隐藏占位文字 (通过JS控制) */
+        .video-wrapper.has-source::after {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="player-card">
+    <div class="video-wrapper" id="videoWrapper">
+        <!-- video 元素：使用一个示例视频 (Big Buck Bunny 开源测试视频) -->
+        <video id="videoPlayer" preload="metadata" playsinline>
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+            您的浏览器不支持视频播放，请使用现代浏览器。
+        </video>
+    </div>
+
+    <!-- 自定义控制栏 -->
+    <div class="controls" id="controlsBar">
+        <!-- 播放/暂停 -->
+        <button class="play-btn" id="playPauseBtn" aria-label="播放或暂停">▶</button>
+
+        <!-- 进度条 + 时间 -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+        </div>
+
+        <!-- 右侧控制: 音量 + 全屏 -->
+        <div class="right-controls">
+            <!-- 音量按钮 (切换滑块) -->
+            <button id="volumeBtn" aria-label="音量">🔊</button>
+            <div class="volume-slider" id="volumeSlider">
+                <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="1">
+            </div>
+            <!-- 全屏按钮 -->
+            <button id="fullscreenBtn" aria-label="全屏">⛶</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const video = document.getElementById('videoPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const volumeBtn = document.getElementById('volumeBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeRange = document.getElementById('volumeRange');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const videoWrapper = document.getElementById('videoWrapper');
+
+        // 标记已有视频源 (移除占位文字)
+        videoWrapper.classList.add('has-source');
+
+        // ---------- 辅助函数 ----------
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgressAndTime() {
+            if (video.duration) {
+                const percent = (video.currentTime / video.duration) * 100;
+                progressFill.style.width = `${percent}%`;
+                timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+            } else {
+                timeDisplay.textContent = '0:00 / 0:00';
+            }
+        }
+
+        // ---------- 播放/暂停 ----------
+        function togglePlay() {
+            if (video.paused) {
+                video.play().catch(e => { /* 自动播放策略忽略 */ });
+            } else {
+                video.pause();
+            }
+        }
+
+        function updatePlayButton() {
+            if (video.paused) {
+                playPauseBtn.textContent = '▶';
+            } else {
+                playPauseBtn.textContent = '⏸';
+            }
+        }
+
+        // 点击视频切换播放
+        video.addEventListener('click', togglePlay);
+        playPauseBtn.addEventListener('click', togglePlay);
+
+        video.addEventListener('play', updatePlayButton);
+        video.addEventListener('pause', updatePlayButton);
+
+        // ---------- 进度条 ----------
+        video.addEventListener('timeupdate', updateProgressAndTime);
+        video.addEventListener('loadedmetadata', updateProgressAndTime);
+
+        // 点击进度条跳转
+        progressBar.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            if (video.duration) {
+                video.currentTime = x * video.duration;
+            }
+        });
+
+        // 拖拽进度 (简单实现, 在进度条上mousedown + mousemove)
+        let isDragging = false;
+        progressBar.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            const rect = this.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            if (video.duration) {
+                video.currentTime = x * video.duration;
+            }
+        });
+        window.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            const rect = progressBar.getBoundingClientRect();
+            let x = (e.clientX - rect.left) / rect.width;
+            x = Math.min(1, Math.max(0, x));
+            if (video.duration) {
+                video.currentTime = x * video.duration;
+                // 实时更新进度显示（视觉）
+                progressFill.style.width = `${x * 100}%`;
+                timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+            }
+        });
+        window.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                // 确保最终进度准确
+                updateProgressAndTime();
+            }
+        });
+
+        // 触摸设备进度拖拽
+        progressBar.addEventListener('touchstart', function(e) {
+            const touch = e.touches[0];
+            const rect = this.getBoundingClientRect();
+            const x = (touch.clientX - rect.left) / rect.width;
+            if (video.duration) {
+                video.currentTime = x * video.duration;
+            }
+        }, { passive: true });
+        progressBar.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = this.getBoundingClientRect();
+            let x = (touch.clientX - rect.left) / rect.width;
+            x = Math.min(1, Math.max(0, x));
+            if (video.duration) {
+                video.currentTime = x * video.duration;
+                progressFill.style.width = `${x * 100}%`;
+                timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+            }
+        }, { passive: false });
+
+        // ---------- 音量控制 ----------
+        let volumeVisible = false;
+        volumeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            volumeVisible = !volumeVisible;
+            volumeSlider.classList.toggle('show', volumeVisible);
+            // 如果音量滑块隐藏，自动失焦
+            if (!volumeVisible) {
+                volumeRange.blur();
+            }
+        });
+
+        // 音量滑块
+        volumeRange.addEventListener('input', function() {
+            const val = parseFloat(this.value);
+            video.volume = val;
+            // 更新图标 (简单处理)
+            if (val === 0) {
+                volumeBtn.textContent = '🔇';
+            } else if (val < 0.5) {
+                volumeBtn.textContent = '🔉';
+            } else {
+                volumeBtn.textContent = '🔊';
+            }
+        });
+
+        // 点击视频区域外关闭音量滑块 (但保留交互)
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.right-controls') && !e.target.closest('.controls')) {
+                if (volumeVisible) {
+                    volumeVisible = false;
+                    volumeSlider.classList.remove('show');
+                }
+            }
+        });
+
+        // 同步音量初始状态
+        video.volume = 1;
+        volumeRange.value = 1;
+        volumeBtn.textContent = '🔊';
+
+        // ---------- 全屏 ----------
+        fullscreenBtn.addEventListener('click', function() {
+            if (!document.fullscreenElement) {
+                // 进入全屏 (优先使用播放器卡片全屏，更沉浸)
+                const container = document.querySelector('.player-card');
+                if (container.requestFullscreen) {
+                    container.requestFullscreen().catch(err => {
+                        // 如果卡片全屏失败，尝试视频元素全屏
+                        if (video.requestFullscreen) video.requestFullscreen();
+                    });
+                } else if (video.requestFullscreen) {
+                    video.requestFullscreen();
+                } else if (video.webkitRequestFullscreen) {
+                    video.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        });
+
+        // 监听全屏变化更新按钮样式 (可选)
+        document.addEventListener('fullscreenchange', updateFullscreenIcon);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
+        function updateFullscreenIcon() {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                fullscreenBtn.textContent = '⛶';  // 或者 '⤢' 保持简洁
+            } else {
+                fullscreenBtn.textContent = '⛶';
+            }
+        }
+
+        // ---------- 额外细节: 视频加载完成更新 ----------
+        video.addEventListener('loadeddata', function() {
+            updateProgressAndTime();
+            videoWrapper.classList.add('has-source');
+        });
+
+        // 如果视频加载失败，仍保持占位符隐藏（已经隐藏）
+        // 处理错误时至少不显示占位文字
+        video.addEventListener('error', function() {
+            videoWrapper.classList.add('has-source');
+            timeDisplay.textContent = '⚠️ 视频不可用';
+        });
+
+        // 键盘快捷键 (空格切换播放)
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT') return;  // 输入框不干扰
+            if (e.key === ' ' || e.key === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            }
+            if (e.key === 'f' || e.key === 'F') {
+                fullscreenBtn.click();
+            }
+        });
+
+        // 初始化显示
+        updateProgressAndTime();
+        updatePlayButton();
+        videoWrapper.classList.add('has-source');
+
+        // 小优化：点击音量滑块时阻止冒泡，避免关闭
+        volumeSlider.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    })();
+</script>
+</body>
+</html>
