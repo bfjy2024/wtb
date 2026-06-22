@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>沉浸 · 视频播放器 (支持MOV)</title>
+    <title>wtb · 视频演示</title>
     <style>
-        /* 全局重置 & 优雅字体 */
+        /* 全局重置 & 优雅渐变背景 */
         * {
             margin: 0;
             padding: 0;
@@ -13,38 +13,40 @@
         }
 
         body {
-            background: #0b0d10;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             padding: 20px;
+            /* 深邃星空渐变 — 好看且沉浸 */
+            background: radial-gradient(ellipse at 30% 20%, #1a1e2e, #0b0d14 70%, #050608);
+            background-attachment: fixed;
         }
 
-        /* 卡片式播放器 — 柔光玻璃质感 */
+        /* 卡片式播放器 — 柔光玻璃质感，带微光边框 */
         .player-card {
             max-width: 1000px;
             width: 100%;
-            background: rgba(22, 26, 32, 0.75);
-            backdrop-filter: blur(14px) saturate(180%);
-            -webkit-backdrop-filter: blur(14px) saturate(180%);
-            border-radius: 42px;
+            background: rgba(16, 20, 30, 0.65);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-radius: 44px;
             padding: 24px 24px 32px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
-            transition: all 0.25s ease;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* 视频容器 — 圆角 & 阴影 */
+        /* 视频容器 — 圆角 & 精致阴影 */
         .video-wrapper {
             position: relative;
             width: 100%;
             padding-bottom: 56.25%; /* 16:9 */
-            border-radius: 28px;
+            border-radius: 30px;
             overflow: hidden;
-            background: #000;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 12px 30px rgba(0, 0, 0, 0.6);
+            background: #080a10;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px rgba(0, 0, 0, 0.7);
             transition: box-shadow 0.3s;
         }
 
@@ -55,8 +57,8 @@
             width: 100%;
             height: 100%;
             display: block;
-            object-fit: cover;  /* 保持比例，铺满容器 */
-            background: #101010;
+            object-fit: cover;
+            background: #0a0c14;
             cursor: pointer;
         }
 
@@ -68,19 +70,19 @@
             flex-wrap: wrap;
             margin-top: 20px;
             padding: 12px 18px;
-            background: rgba(12, 15, 20, 0.7);
-            backdrop-filter: blur(8px) saturate(160%);
-            -webkit-backdrop-filter: blur(8px) saturate(160%);
+            background: rgba(10, 14, 22, 0.7);
+            backdrop-filter: blur(10px) saturate(160%);
+            -webkit-backdrop-filter: blur(10px) saturate(160%);
             border-radius: 60px;
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             transition: background 0.2s;
         }
 
         .controls button {
             background: transparent;
             border: none;
-            color: #f0f4fc;
+            color: #e8edf8;
             font-size: 22px;
             width: 44px;
             height: 44px;
@@ -96,7 +98,7 @@
         }
 
         .controls button:hover {
-            background: rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.14);
             transform: scale(1.04);
             color: #ffffff;
         }
@@ -118,7 +120,7 @@
         .progress-bar {
             flex: 1;
             height: 5px;
-            background: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 10px;
             position: relative;
             cursor: pointer;
@@ -133,20 +135,20 @@
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #b3baff, #7a8cff);
+            background: linear-gradient(90deg, #a8b8ff, #6d8cff, #5a7aff);
             border-radius: 10px;
-            box-shadow: 0 0 12px rgba(100, 140, 255, 0.5);
+            box-shadow: 0 0 16px rgba(90, 122, 255, 0.4);
             transition: width 0.1s linear;
             position: relative;
         }
 
         /* 时间显示 */
         .time-display {
-            color: #d0d9e8;
+            color: #c8d2e8;
             font-size: 0.9rem;
             font-weight: 450;
             letter-spacing: 0.3px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.25);
             padding: 4px 12px;
             border-radius: 40px;
             backdrop-filter: blur(4px);
@@ -194,7 +196,7 @@
             width: 100%;
             height: 4px;
             -webkit-appearance: none;
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 6px;
             outline: none;
             transition: background 0.2s;
@@ -204,17 +206,17 @@
             -webkit-appearance: none;
             width: 14px;
             height: 14px;
-            background: #d6e0ff;
+            background: #d0dcff;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(70, 130, 255, 0.5);
+            box-shadow: 0 0 12px rgba(70, 130, 255, 0.5);
             border: 1px solid rgba(255,255,255,0.3);
         }
 
         .volume-slider input[type="range"]::-moz-range-thumb {
             width: 14px;
             height: 14px;
-            background: #d6e0ff;
+            background: #d0dcff;
             border-radius: 50%;
             cursor: pointer;
             border: none;
@@ -271,30 +273,29 @@
 
         /* 加载/提示文字（优雅占位） */
         .video-wrapper::after {
-            content: "🎬 准备就绪";
+            content: "🎬 wtb 视频演示";
             position: absolute;
             bottom: 20px;
             right: 24px;
-            color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.15);
             font-size: 0.85rem;
             font-weight: 300;
             letter-spacing: 0.6px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.25);
             padding: 4px 16px;
             border-radius: 40px;
             backdrop-filter: blur(4px);
             pointer-events: none;
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.03);
             opacity: 0.8;
             transition: opacity 0.5s;
         }
 
-        /* 当视频有源时隐藏占位文字 (通过JS控制) */
         .video-wrapper.has-source::after {
             opacity: 0;
         }
 
-        /* 文件上传区域 — 简洁优雅 */
+        /* 文件上传区域 — 融入背景 */
         .upload-area {
             margin-top: 18px;
             display: flex;
@@ -303,27 +304,27 @@
             gap: 16px;
             flex-wrap: wrap;
             padding: 6px 12px;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.02);
             border-radius: 60px;
-            border: 1px dashed rgba(255,255,255,0.12);
+            border: 1px dashed rgba(255,255,255,0.08);
             backdrop-filter: blur(4px);
             transition: all 0.2s;
         }
 
         .upload-area:hover {
-            border-color: rgba(255,255,255,0.25);
-            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.04);
         }
 
         .upload-label {
-            color: #bcc8e0;
+            color: #aab8d8;
             font-size: 0.9rem;
             font-weight: 400;
             letter-spacing: 0.3px;
             cursor: pointer;
             padding: 6px 14px;
             border-radius: 40px;
-            background: rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.03);
             transition: background 0.2s;
             display: inline-flex;
             align-items: center;
@@ -331,7 +332,7 @@
         }
 
         .upload-label:hover {
-            background: rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.08);
             color: #ffffff;
         }
 
@@ -340,7 +341,7 @@
         }
 
         .file-name {
-            color: #a0b0c8;
+            color: #8899bb;
             font-size: 0.85rem;
             background: rgba(0,0,0,0.2);
             padding: 4px 14px;
@@ -353,9 +354,9 @@
         }
 
         .reset-btn {
-            background: rgba(255,70,70,0.08);
-            border: 1px solid rgba(255,70,70,0.15);
-            color: #f0b0b0;
+            background: rgba(255,70,70,0.06);
+            border: 1px solid rgba(255,70,70,0.12);
+            color: #d0a0a0;
             padding: 4px 14px;
             border-radius: 40px;
             font-size: 0.8rem;
@@ -365,9 +366,9 @@
         }
 
         .reset-btn:hover {
-            background: rgba(255,70,70,0.2);
-            color: #ffd0d0;
-            border-color: rgba(255,70,70,0.3);
+            background: rgba(255,70,70,0.15);
+            color: #ffc0c0;
+            border-color: rgba(255,70,70,0.25);
         }
 
         @media (max-width: 500px) {
@@ -382,33 +383,49 @@
                 text-align: center;
             }
         }
+
+        /* 小点缀：光晕 */
+        .player-card::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(80, 120, 255, 0.06), transparent 70%);
+            pointer-events: none;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+        }
+        .player-card {
+            position: relative;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
 
 <div class="player-card">
     <div class="video-wrapper" id="videoWrapper">
-        <!-- video 元素: 默认使用一个示例MOV视频 (来自可用的公共测试文件) 
-             如果用户不提供文件，则使用这个演示视频。
-             注意：此处使用了一个公开的 .mov 示例 (实际上BigBuckBunny也有mov版本，但为了兼容性我们用mp4作为回退)
-             但为了演示MOV支持，我们默认加载一个可靠的MOV测试视频 (来自 github 上的示例)
-        -->
+        <!-- video 元素：默认加载 wtb 目录下的第一个视频 -->
+        <!-- 注意：将 'wtb/你的视频文件名.mov' 替换为实际文件名 -->
+        <!-- 由于我们无法动态列出目录，这里使用一个约定：如果存在 wtb/video.mov 则加载，否则使用回退 -->
+        <!-- 你可以将视频命名为 video.mov 或修改下面的 src -->
         <video id="videoPlayer" preload="metadata" playsinline>
-            <!-- 默认加载一个公共的 .mov 文件 (来自 Apple 示例) 以展示MOV支持 -->
-            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
-            <!-- 备选: 如果浏览器支持mov，但这里为了演示，我们同时也提供一个mov源 (但实际需要真实mov文件) -->
-            <!-- 为了演示，我们保留两个源，但使用一个公共mov (有些浏览器可能不支持，所以用mp4回退) -->
-            <!-- 但真正的MOV支持取决于浏览器，我们通过JS让用户上传mov文件来体验 -->
-            您的浏览器不支持视频播放，请使用现代浏览器。
+            <!-- 默认加载 wtb 目录下的第一个视频 (请将 'video.mov' 替换为实际文件名) -->
+            <source src="wtb/video.mov" type="video/quicktime">
+            <!-- 备选：如果是mp4 -->
+            <source src="wtb/video.mp4" type="video/mp4">
+            <!-- 如果以上都不存在，显示提示 -->
+            您的浏览器不支持视频播放，或视频文件未找到。
         </video>
     </div>
 
     <!-- 自定义控制栏 -->
     <div class="controls" id="controlsBar">
-        <!-- 播放/暂停 -->
         <button class="play-btn" id="playPauseBtn" aria-label="播放或暂停">▶</button>
 
-        <!-- 进度条 + 时间 -->
         <div class="progress-container">
             <div class="progress-bar" id="progressBar">
                 <div class="progress-fill" id="progressFill"></div>
@@ -416,7 +433,6 @@
             <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
         </div>
 
-        <!-- 右侧控制: 音量 + 全屏 -->
         <div class="right-controls">
             <button id="volumeBtn" aria-label="音量">🔊</button>
             <div class="volume-slider" id="volumeSlider">
@@ -426,13 +442,13 @@
         </div>
     </div>
 
-    <!-- 文件上传区域 — 支持 MOV 等格式 -->
+    <!-- 上传区域 (方便测试其他视频) -->
     <div class="upload-area">
         <label class="upload-label" for="fileInput">
             📁 选择视频 (MOV/MP4/AVI...)
             <input type="file" id="fileInput" accept="video/*,.mov,.qt,.mp4,.avi,.mkv">
         </label>
-        <span class="file-name" id="fileName">未选择文件</span>
+        <span class="file-name" id="fileName">wtb/video.mov</span>
         <button class="reset-btn" id="resetBtn">↺ 重置</button>
     </div>
 </div>
@@ -453,7 +469,7 @@
         const fileName = document.getElementById('fileName');
         const resetBtn = document.getElementById('resetBtn');
 
-        // 标记已有视频源 (移除占位文字)
+        // 标记已有视频源
         videoWrapper.classList.add('has-source');
 
         // ---------- 辅助函数 ----------
@@ -465,7 +481,7 @@
         }
 
         function updateProgressAndTime() {
-            if (video.duration && !isNaN(video.duration)) {
+            if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
                 const percent = (video.currentTime / video.duration) * 100;
                 progressFill.style.width = `${percent}%`;
                 timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
@@ -491,7 +507,6 @@
             }
         }
 
-        // 点击视频切换播放
         video.addEventListener('click', togglePlay);
         playPauseBtn.addEventListener('click', togglePlay);
 
@@ -502,22 +517,20 @@
         video.addEventListener('timeupdate', updateProgressAndTime);
         video.addEventListener('loadedmetadata', updateProgressAndTime);
 
-        // 点击进度条跳转
         progressBar.addEventListener('click', function(e) {
             const rect = this.getBoundingClientRect();
             const x = (e.clientX - rect.left) / rect.width;
-            if (video.duration && !isNaN(video.duration)) {
+            if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
                 video.currentTime = x * video.duration;
             }
         });
 
-        // 拖拽进度 (简单实现)
         let isDragging = false;
         progressBar.addEventListener('mousedown', function(e) {
             isDragging = true;
             const rect = this.getBoundingClientRect();
             const x = (e.clientX - rect.left) / rect.width;
-            if (video.duration && !isNaN(video.duration)) {
+            if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
                 video.currentTime = x * video.duration;
             }
         });
@@ -526,7 +539,7 @@
             const rect = progressBar.getBoundingClientRect();
             let x = (e.clientX - rect.left) / rect.width;
             x = Math.min(1, Math.max(0, x));
-            if (video.duration && !isNaN(video.duration)) {
+            if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
                 video.currentTime = x * video.duration;
                 progressFill.style.width = `${x * 100}%`;
                 timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
@@ -539,12 +552,12 @@
             }
         });
 
-        // 触摸设备进度拖拽
+        // 触摸
         progressBar.addEventListener('touchstart', function(e) {
             const touch = e.touches[0];
             const rect = this.getBoundingClientRect();
             const x = (touch.clientX - rect.left) / rect.width;
-            if (video.duration && !isNaN(video.duration)) {
+            if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
                 video.currentTime = x * video.duration;
             }
         }, { passive: true });
@@ -554,14 +567,14 @@
             const rect = this.getBoundingClientRect();
             let x = (touch.clientX - rect.left) / rect.width;
             x = Math.min(1, Math.max(0, x));
-            if (video.duration && !isNaN(video.duration)) {
+            if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
                 video.currentTime = x * video.duration;
                 progressFill.style.width = `${x * 100}%`;
                 timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
             }
         }, { passive: false });
 
-        // ---------- 音量控制 ----------
+        // ---------- 音量 ----------
         let volumeVisible = false;
         volumeBtn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -630,53 +643,51 @@
             }
         }
 
-        // ---------- 文件上传：支持 MOV 及其他视频格式 ----------
+        // ---------- 文件上传 ----------
         fileInput.addEventListener('change', function(e) {
             const file = this.files[0];
             if (!file) return;
 
-            // 显示文件名
             fileName.textContent = file.name.length > 25 ? file.name.substr(0, 22) + '…' : file.name;
 
-            // 检查是否为视频文件 (MIME 或者扩展名)
             const fileURL = URL.createObjectURL(file);
-            // 暂停当前播放
             video.pause();
-            // 重置视频源
             video.src = fileURL;
             video.load();
-            // 播放新视频 (自动播放策略可能限制，但用户点击触发)
             video.play().catch(() => {});
-            // 更新UI
             videoWrapper.classList.add('has-source');
-            // 重置进度
             progressFill.style.width = '0%';
             timeDisplay.textContent = '0:00 / 0:00';
 
-            // 当视频加载完成后更新
             video.addEventListener('loadedmetadata', function onLoaded() {
                 updateProgressAndTime();
                 video.removeEventListener('loadedmetadata', onLoaded);
             });
         });
 
-        // 重置按钮: 恢复默认视频 (演示)
+        // ---------- 重置：恢复默认 wtb/video.mov ----------
         resetBtn.addEventListener('click', function() {
-            // 撤销对象URL (如果有)
             if (video.src && video.src.startsWith('blob:')) {
                 URL.revokeObjectURL(video.src);
             }
-            // 恢复默认视频 (使用mp4示例)
-            video.src = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+            // 重置为 wtb 目录下的视频 (请确保文件存在)
+            video.src = 'wtb/video.mov';
+            // 如果浏览器不支持mov，尝试mp4
+            // 这里我们同时保留两个source，但video.src会覆盖，所以重新设置
             video.load();
             video.play().catch(() => {});
-            fileName.textContent = '未选择文件';
-            fileInput.value = ''; // 清空input
+            fileName.textContent = 'wtb/video.mov';
+            fileInput.value = '';
             videoWrapper.classList.add('has-source');
+            // 等待加载完成更新
+            video.addEventListener('loadedmetadata', function onLoaded() {
+                updateProgressAndTime();
+                video.removeEventListener('loadedmetadata', onLoaded);
+            });
             updateProgressAndTime();
         });
 
-        // ---------- 额外细节: 视频加载完成更新 ----------
+        // ---------- 视频加载事件 ----------
         video.addEventListener('loadeddata', function() {
             updateProgressAndTime();
             videoWrapper.classList.add('has-source');
@@ -684,7 +695,13 @@
 
         video.addEventListener('error', function() {
             videoWrapper.classList.add('has-source');
-            timeDisplay.textContent = '⚠️ 视频不可用';
+            timeDisplay.textContent = '⚠️ 视频未找到';
+            // 尝试加载 mp4 备选
+            if (video.src && video.src.includes('.mov')) {
+                // 如果mov加载失败，尝试mp4
+                video.src = 'wtb/video.mp4';
+                video.load();
+            }
         });
 
         // 键盘快捷键
@@ -699,17 +716,16 @@
             }
         });
 
-        // 初始化显示
+        // 初始化
         updateProgressAndTime();
         updatePlayButton();
         videoWrapper.classList.add('has-source');
 
-        // 音量滑块点击不冒泡
         volumeSlider.addEventListener('click', function(e) {
             e.stopPropagation();
         });
 
-        // 额外: 拖拽文件到页面 (高级功能)
+        // 拖拽支持
         document.addEventListener('dragover', function(e) {
             e.preventDefault();
         });
